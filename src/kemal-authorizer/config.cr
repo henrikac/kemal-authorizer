@@ -16,7 +16,7 @@ module Kemal::Authorizer
 
     def initialize
       @anonymous_url = "/"
-      @login_url = "/auth/login"
+      @login_url = "/login"
       @user_obj_name = "user"
       @user_type = Kemal::Authorizer::UserStorableObject
     end
