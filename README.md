@@ -1,6 +1,6 @@
 # kemal-authorizer
 
-TODO: Write a description here
+This is a shard that makes it easy to make specific routes in a Kemal application only accessible to either anonymous, authenticated or authorized (administrators) users.
 
 ## Installation
 
@@ -9,7 +9,7 @@ TODO: Write a description here
    ```yaml
    dependencies:
      kemal-authorizer:
-       github: your-github-user/kemal-authorizer
+       github: henrikac/kemal-authorizer
    ```
 
 2. Run `shards install`
@@ -17,18 +17,90 @@ TODO: Write a description here
 ## Usage
 
 ```crystal
+require "kemal"
+require "kemal-session"
 require "kemal-authorizer"
+
+Kemal::Session.config do |config|
+  config.secret = "some_secret"
+end
+
+# Only anonymous users can access these routes.
+# authenticated users will be redirected to "/" (default route).
+add_handler Kemal::Authorizer::AnonymousHandler.new({
+  "/login" => ["GET", "POST"],
+  "/signup" => ["GET", "POST"]
+})
+
+# Only authenticated users can access these routes.
+# Unauthenticated users will be redirected to "/login?next=..." (default route).
+add_handler Kemal::Authorizer::AuthenticationHandler.new({
+  "/dashboard" => ["GET"],
+  "/logout" => ["POST"]
+})
+
+# Only authenticated users that `is_admin` can access this route.
+# Unauthenticated users will be redirected to "/login?next=..." (default route).
+# If the user is authenticated but not an admin then the status code will be set to 401.
+add_handler Kemal::Authorizer::AuthorizationHandler.new({
+  "/admin" => ["GET"]
+})
+
+get "/" do |env|
+  user = Kemal::Authorizer::UserStorableObject.new(1, "user@mail.com", true) # id, mail, is_admin
+  env.session.object("user", user)
+  "Home"
+end
+
+get "/login" do |env|
+  "Login"
+end
+
+get "/admin" do |env|
+  "Admin"
+end
+
+Kemal.run
 ```
 
-TODO: Write usage instructions here
+`Kemal::Authorizer` has a few default configurations that can changed if needed.
 
-## Development
+```crystal
+Kemal::Authorizer.config do |config|
+  config.anonymous_url = "/"
+  config.login_url = "/login"
+  config.user_obj_name = "user" # name of the session object env.session.object(user_obj_name, obj)
+  config.user_type = Kemal::Authorizer::UserStorableObject
+end
+```
 
-TODO: Write development instructions here
+If the built-in `UserStorableObject` is not sufficient enough then it is possible to make
+a custom type and then set `config.user_type` to the new type. New StorableUser types must
+inherit from `Kemal::Authorizer::StorableUser`.
+
+```crystal
+require "json"
+
+class MyStorableUserType < Kemal::Authorizer::StorableUser
+  include JSON::Serializable
+  include Kemal::Session::StorableObject
+
+  property id : Int32
+  property name : String
+
+  def initialize(@id : Int32, @name : String); end
+end
+
+# and then
+
+Kemal::Authorizer.config do |config|
+  config.user_type = MyStorableUserType
+end
+```
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/kemal-authorizer/fork>)
+1. Fork it (<https://github.com/henrikac/kemal-authorizer/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -36,4 +108,4 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [Henrik Christensen](https://github.com/your-github-user) - creator and maintainer
+- [Henrik Christensen](https://github.com/henrikac) - creator and maintainer
