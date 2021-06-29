@@ -59,5 +59,15 @@ class TestStorableUser < Kemal::Authorizer::StorableUser
 
   property id, name
 
-  def initialize(@id : Int32 = 1, @name : String = "Alice", @is_admin : Bool = false); end
+  def initialize(@id : Int32 = 1, @name : String = "Alice"); end
+end
+
+# Used in config_spec
+class NewStorableUserType < Kemal::Authorizer::StorableUser
+  include JSON::Serializable
+  include Kemal::Session::StorableObject
+
+  property id
+
+  def initialize(@id : Int32); end
 end

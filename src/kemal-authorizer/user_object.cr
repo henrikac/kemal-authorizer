@@ -10,7 +10,7 @@ module Kemal::Authorizer
     include JSON::Serializable
     include Kemal::Session::StorableObject
 
-    property is_admin : Bool
+    property is_admin : Bool = false
   end
 
   # `Kemal::Authorizer::UserStorableObject` is the default type used in the different authorize handlers.
@@ -21,6 +21,11 @@ module Kemal::Authorizer
     property id : Int32
     property email : String
 
+    # Creates a new `Kemal::Authorizer::UserStorableObject`.
+    # This user object is by default not admin.
+    def initialize(@id : Int32, @email : String); end
+
+    # Creates a new `Kemal::Authorizer::UserStorableObject`.
     def initialize(@id : Int32, @email : String, @is_admin : Bool); end
   end
 end

@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-describe Kemal::Authorizer do
+describe "Kemal::Authorizer" do
   describe "AnonymousHandler" do
     methods = ["GET", "POST"]
     handler = Kemal::Authorizer::AnonymousHandler.new({"/login" => methods})
