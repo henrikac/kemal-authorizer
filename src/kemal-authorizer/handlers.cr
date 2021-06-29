@@ -39,7 +39,6 @@ module Kemal::Authorizer
       return call_next(context) if user.nil?
 
       context.redirect Kemal::Authorizer.config.anonymous_url
-      return call_next(context)
     end
   end
 
@@ -65,9 +64,9 @@ module Kemal::Authorizer
         login_route = Kemal::Authorizer.config.login_url
         path = context.request.path
         context.redirect "#{login_route}?next=#{URI.encode_www_form(path)}"
+      else
+        return call_next(context)
       end
-
-      return call_next(context)
     end
   end
 
@@ -92,13 +91,14 @@ module Kemal::Authorizer
         login_route = Kemal::Authorizer.config.login_url
         path = context.request.path
         context.redirect "#{login_route}?next=#{URI.encode_www_form(path)}"
-        return call_next(context)
       else
         user_type = Kemal::Authorizer.config.user_type
-        return call_next(context) if user_type.cast(user).is_admin
+        if user_type.cast(user).is_admin
+          return call_next(context)
+        else
+          context.response.status_code = 401
+        end
       end
-
-      context.response.status_code = 401
     end
   end
 end
