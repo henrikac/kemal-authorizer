@@ -92,7 +92,9 @@ add_handler CustomHandler.new({"/my/route", ["GET", "POST", "PUT"]})
 #### Custom StorableUser
 If the built-in `UserStorableObject` is not sufficient enough then it is possible to make
 a custom type and then set `config.user_type` to the new type. New StorableUser types must
-inherit from `Kemal::Authorizer::StorableUser`.
+inherit from `Kemal::Authorizer::StorableUser`.  
+
+`Kemal::Authorizer::StorableUser` is a class with a single property `is_admin` that is set to `false` by default.
 
 ```crystal
 require "json"
@@ -112,6 +114,11 @@ end
 Kemal::Authorizer.config do |config|
   config.user_type = MyStorableUserType
 end
+
+user = MyStorableUserType.new(1, "Alice")
+user.id       # => 1
+user.name     # => Alice
+user.is_admin # => false
 ```
 
 ## Contributing
