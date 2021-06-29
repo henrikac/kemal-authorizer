@@ -63,6 +63,7 @@ end
 Kemal.run
 ```
 
+#### Configuration
 `Kemal::Authorizer` has a few default configurations that can changed if needed.
 
 ```crystal
@@ -74,6 +75,21 @@ Kemal::Authorizer.config do |config|
 end
 ```
 
+#### Custom Handlers
+You can create custom handlers by inheriting from `Kemal::Authorizer::BaseHandler`.
+
+```crystal
+class CustomHandler < Kemal::Authorizer::BaseHandler
+  def call(context)
+    # add custom logic
+    call_next context
+  end
+end
+
+add_handler CustomHandler.new({"/my/route", ["GET", "POST", "PUT"]})
+```
+
+#### Custom StorableUser
 If the built-in `UserStorableObject` is not sufficient enough then it is possible to make
 a custom type and then set `config.user_type` to the new type. New StorableUser types must
 inherit from `Kemal::Authorizer::StorableUser`.
