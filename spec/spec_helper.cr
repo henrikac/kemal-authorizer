@@ -61,18 +61,3 @@ class TestStorableUser < Kemal::Authorizer::StorableUser
 
   def initialize(@id : Int32 = 1, @name : String = "Alice", @is_admin : Bool = false); end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -94,16 +94,3 @@ describe Kemal::Authorizer do
     end
   end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
